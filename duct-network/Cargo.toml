@@ -8,3 +8,5 @@ tokio = { version = "1", features = ["full"] }
 hyper = { version = "1.8.1", features = ["full"] }
 hyper-tls = "0.6" # Pour le support HTTPS
 http = "1.4.0"
+async-trait = "0.1.89"
+anyhow = "1.0"

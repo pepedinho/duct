@@ -1,14 +1,20 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+use clap::Parser;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[derive(Parser, Debug)]
+#[command(name = "duct")]
+#[command(about = "A powerful and observant HTTP client", long_about = None)]
+pub struct Cli {
+    pub url: String,
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+    #[arg(short = 'X', long, default_value = "GET")]
+    pub method: String,
+
+    #[arg(short, long)]
+    pub data: Option<String>,
+
+    #[arg(short = 'H', long)]
+    pub header: Vec<String>,
+
+    #[arg(short, long)]
+    pub trace: bool,
 }
