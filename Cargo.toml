@@ -1,0 +1,8 @@
+[workspace]
+members = [ 
+  "duct",
+  "duct-cli",
+  "duct-network",
+]
+
+resolver = "3"
