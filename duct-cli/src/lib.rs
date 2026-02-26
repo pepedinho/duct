@@ -22,5 +22,5 @@ pub struct Cli {
     pub user_agent: Option<String>,
 
     #[arg(short, long)]
-    pub redirection: bool,
+    pub redirection: Option<u8>,
 }

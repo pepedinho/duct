@@ -12,13 +12,13 @@ pub struct StandardRequest {
     url: String,
     headers: HashMap<String, String>,
     body: String,
-    redirection: bool,
+    redirection: Option<u8>,
     user_agent: String,
 }
 
-fn redirection_policy(redir: bool) -> Policy {
-    if redir {
-        Policy::limited(10)
+fn redirection_policy(redir: Option<u8>) -> Policy {
+    if let Some(redir) = redir {
+        Policy::limited(redir as usize)
     } else {
         Policy::none()
     }
@@ -55,7 +55,7 @@ impl StandardRequest {
         headers: HashMap<String, String>,
         body: String,
         user_agent: Option<String>,
-        redirection: bool,
+        redirection: Option<u8>,
     ) -> Self {
         Self {
             method,
