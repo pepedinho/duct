@@ -9,7 +9,7 @@ pub trait Request {
 }
 
 pub struct StandardRequest {
-    method: http::Method,
+    method: reqwest::Method,
     url: String,
     headers: HashMap<String, String>,
     body: String,
@@ -19,13 +19,15 @@ pub struct StandardRequest {
 impl Request for StandardRequest {
     async fn send(&self) -> anyhow::Result<String> {
         println!("Send standard request to {}", self.url);
+        let resp = reqwest::get(&self.url).await?;
+        println!("{resp:#?}");
         Ok("200".to_string())
     }
 }
 
 impl StandardRequest {
     pub fn new(
-        method: http::Method,
+        method: reqwest::Method,
         url: String,
         headers: HashMap<String, String>,
         body: String,
