@@ -1,7 +1,7 @@
 use async_trait::async_trait;
+use duct_logger::log;
+use reqwest::redirect::Policy;
 use std::collections::HashMap;
-
-use crate::http;
 
 #[async_trait]
 pub trait Request {
@@ -9,32 +9,60 @@ pub trait Request {
 }
 
 pub struct StandardRequest {
-    method: http::Method,
+    method: reqwest::Method,
     url: String,
     headers: HashMap<String, String>,
     body: String,
+    redirection: Option<u8>,
+    user_agent: String,
+}
+
+fn redirection_policy(redir: Option<u8>) -> Policy {
+    if let Some(redir) = redir {
+        Policy::limited(redir as usize)
+    } else {
+        Policy::none()
+    }
 }
 
 #[async_trait]
 impl Request for StandardRequest {
     async fn send(&self) -> anyhow::Result<String> {
+        let client = reqwest::Client::builder()
+            .user_agent(&self.user_agent)
+            .redirect(redirection_policy(self.redirection))
+            .build()?;
         println!("Send standard request to {}", self.url);
+        let resp = client
+            .request(self.method.clone(), &self.url)
+            .send()
+            .await?;
+        let status = &resp.status();
+        log!(duct_logger::Level::Info, "[{status}] - {}", resp.url());
+        let body = resp.text().await?;
+        if !body.is_empty() {
+            println!("{body}");
+        }
         Ok("200".to_string())
     }
 }
 
 impl StandardRequest {
     pub fn new(
-        method: http::Method,
+        method: reqwest::Method,
         url: String,
         headers: HashMap<String, String>,
         body: String,
+        user_agent: Option<String>,
+        redirection: Option<u8>,
     ) -> Self {
         Self {
             method,
             url,
             headers,
             body,
+            user_agent: user_agent.unwrap_or("duct/0.1.0".to_string()),
+            redirection,
         }
     }
 }
