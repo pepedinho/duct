@@ -17,4 +17,10 @@ pub struct Cli {
 
     #[arg(short, long)]
     pub trace: bool,
+
+    #[arg(long)]
+    pub user_agent: Option<String>,
+
+    #[arg(short, long)]
+    pub redirection: bool,
 }

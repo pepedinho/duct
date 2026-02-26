@@ -30,6 +30,8 @@ pub fn build_request(cli: &Cli) -> Box<dyn Request> {
             cli.url.clone(),
             headers,
             cli.data.clone().unwrap_or_default(),
+            cli.user_agent.clone(),
+            cli.redirection,
         ))
     }
 }
