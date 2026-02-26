@@ -33,19 +33,16 @@ impl Request for StandardRequest {
             .redirect(redirection_policy(self.redirection))
             .build()?;
         println!("Send standard request to {}", self.url);
-        // let resp = client.get(&self.url).send().await?;
         let resp = client
             .request(self.method.clone(), &self.url)
             .send()
             .await?;
         let status = &resp.status();
-        // println!("[{status}] - {}", resp.url());
         log!(duct_logger::Level::Info, "[{status}] - {}", resp.url());
         let body = resp.text().await?;
         if !body.is_empty() {
             println!("{body}");
         }
-        // println!("{resp:#?}");
         Ok("200".to_string())
     }
 }

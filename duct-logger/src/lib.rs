@@ -44,12 +44,12 @@ impl Logger {
     }
 
     pub fn set_channel(channel: Channel) {
-        let mut logger = GLOBAL_LOGGER.lock().unwrap();
+        let mut logger = GLOBAL_LOGGER.lock().unwrap_or_else(|e| e.into_inner());
         logger.channel = channel;
     }
 
     fn dispatch(log: &str) {
-        let logger = GLOBAL_LOGGER.lock().unwrap();
+        let logger = GLOBAL_LOGGER.lock().unwrap_or_else(|e| e.into_inner());
         match &logger.channel {
             Channel::Stdout => println!("{log}"),
             Channel::Stderr => eprintln!("{log}"),
