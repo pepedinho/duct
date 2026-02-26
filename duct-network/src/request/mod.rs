@@ -1,8 +1,6 @@
 use async_trait::async_trait;
 use std::collections::HashMap;
 
-use crate::http;
-
 #[async_trait]
 pub trait Request {
     async fn send(&self) -> anyhow::Result<String>;
@@ -18,8 +16,9 @@ pub struct StandardRequest {
 #[async_trait]
 impl Request for StandardRequest {
     async fn send(&self) -> anyhow::Result<String> {
+        let client = reqwest::Client::new();
         println!("Send standard request to {}", self.url);
-        let resp = reqwest::get(&self.url).await?;
+        let resp = client.get(&self.url).send().await?;
         println!("{resp:#?}");
         Ok("200".to_string())
     }
