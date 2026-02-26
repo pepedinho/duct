@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use duct_logger::log;
 use reqwest::redirect::Policy;
 use std::collections::HashMap;
 
@@ -38,7 +39,8 @@ impl Request for StandardRequest {
             .send()
             .await?;
         let status = &resp.status();
-        println!("[{status}] - {}", resp.url());
+        // println!("[{status}] - {}", resp.url());
+        log!(duct_logger::Level::Info, "[{status}] - {}", resp.url());
         let body = resp.text().await?;
         if !body.is_empty() {
             println!("{body}");

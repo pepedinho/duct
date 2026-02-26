@@ -1,7 +1,7 @@
 [workspace]
 members = [ 
   "duct",
-  "duct-cli",
+  "duct-cli", "duct-logger",
   "duct-network",
 ]
 
