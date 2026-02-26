@@ -1,17 +1,20 @@
 use std::collections::HashMap;
 
 use duct_cli::Cli;
-use duct_network::{
-    http::Method,
-    request::{Request, StandardRequest},
-};
+use duct_network::request::{Request, StandardRequest};
 
 use clap::Parser;
+use http::Method;
 
-fn main() {
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
     dbg!(&cli);
     let req = build_request(&cli);
+
+    let response = req.send().await?;
+    println!("Response: {}", response);
+    Ok(())
 }
 
 pub fn build_request(cli: &Cli) -> Box<dyn Request> {
@@ -29,7 +32,7 @@ pub fn build_request(cli: &Cli) -> Box<dyn Request> {
             cli.method.parse().unwrap_or(Method::GET),
             cli.url.clone(),
             headers,
-            cli.data.clone().unwrap_or_default(),
+            cli.data.as_ref().cloned().unwrap_or_default(),
         ))
     }
 }
