@@ -1,6 +1,10 @@
 use async_trait::async_trait;
 use duct_logger::log;
-use reqwest::redirect::Policy;
+use reqwest::{
+    Body,
+    header::{HeaderMap, HeaderName, HeaderValue},
+    redirect::Policy,
+};
 use std::collections::HashMap;
 
 #[async_trait]
@@ -25,6 +29,18 @@ fn redirection_policy(redir: Option<u8>) -> Policy {
     }
 }
 
+fn hasmap_to_header_map(
+    map: &HashMap<String, String>,
+) -> anyhow::Result<reqwest::header::HeaderMap> {
+    map.into_iter()
+        .try_fold(HeaderMap::new(), |mut headers, (k, v)| {
+            let name = HeaderName::from_bytes(k.as_bytes())?;
+            let value = HeaderValue::from_str(&v)?;
+            headers.insert(name, value);
+            Ok(headers)
+        })
+}
+
 #[async_trait]
 impl Request for StandardRequest {
     async fn send(&self) -> anyhow::Result<String> {
@@ -33,8 +49,11 @@ impl Request for StandardRequest {
             .redirect(redirection_policy(self.redirection))
             .build()?;
         println!("Send standard request to {}", self.url);
+        let headers = hasmap_to_header_map(&self.headers)?;
         let resp = client
             .request(self.method.clone(), &self.url)
+            .headers(headers)
+            .body(self.body.clone())
             .send()
             .await?;
         let status = &resp.status();
